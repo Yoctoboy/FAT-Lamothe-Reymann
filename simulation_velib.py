@@ -27,9 +27,9 @@ class Event:
 	
     def __str__(self): #Overload print(Event e)
         if self.name == "Pedestrian arrival":
-            return "New Event (Pedestrian) : Time={0:.3f} ; At S{1}".format(self.time, self.station.id)
+            return "Event Pedestrian : Time={0:.3f} - At S{1}".format(self.time, self.station.id)
         elif self.name == "Bike arrival":
-            return "New Event (Bike)       : Time={0:.3f} ; From S{1} to S{2}".format(self.time, self.station.id, self.target_station.id)
+            return "Event Bike       : Time={0:.3f} - From S{1} to S{2}".format(self.time, self.station.id, self.target_station.id)
 			
     
     def handle(self, list_stations, mean_travel_times):
@@ -63,12 +63,9 @@ class Event:
 def simulation(nb_places, client_intensities, mean_travel_times, initial_fullness, ending_time, list_probabilities_of_target_station):
     list_events = []
     current_time = 0
-    list_stations = []
+    list_stations = []  
     for i in range(len(nb_places)):
         list_stations.append(Station(i+3, nb_places[i], client_intensities[i], initial_fullness[i], list_probabilities_of_target_station[i]))
-    
-    for i in range(5):
-        print(list_stations[i].id, list_stations[i].nb_places, list_stations[i].client_intensity, list_stations[i].nb_used_places)
     
     time_of_next_arrival_to_station = np.random.exponential(client_intensities)
     list_events = [Event("Pedestrian arrival", current_time + time_of_next_arrival_to_station[i], list_stations[i]) for i in range(len(list_stations))]
