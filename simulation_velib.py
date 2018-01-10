@@ -73,10 +73,18 @@ def simulation(nb_places, client_intensities, mean_travel_times, initial_fullnes
             hp.heappush(list_events, new_event)
         
     
-nb_places = [10,20,30]
-client_intensities = [1,2,3]
-mean_travel_times = [[1,2,2],[2,1,2],[2,2,1]]
-initial_fullness = [8,15,22]
-list_probabilities_of_target_station = [[0,0.5,0.5],[0.5,0,0.5],[0.5,0.5,0]]
+nb_places = [24, 20, 20, 15, 20]
+initial_fullness = [20, 15, 17, 13, 18]
+client_intensities = [1/2.8, 1/3.7, 1/5.5, 1/3.5, 1/4.6]
+list_probabilities_of_target_station = [[0,    0.2,  0.3,  0.2,  0.3 ],
+                                        [0.2,  0,    0.3,  0.2,  0.3 ],
+                                        [0.2,  0.25, 0,    0.25, 0.3 ],
+                                        [0.15, 0.2,  0.3,  0,    0.35],
+                                        [0.2,  0.25, 0.35, 0.2,  0   ]]
+mean_travel_times = [[0, 3, 5, 7, 7],
+                     [2, 0, 2, 5, 5],
+                     [4, 2, 0, 3, 3],
+                     [8, 6, 4, 0, 2],
+                     [7, 7, 5, 2, 0]]
 ending_time = 100
 simulation(nb_places, client_intensities, mean_travel_times, initial_fullness, ending_time, list_probabilities_of_target_station)
