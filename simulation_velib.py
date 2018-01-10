@@ -1,46 +1,55 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import heapq as hp
+import sys
 #il faut verifier ce que prend np.random.exponential en parametre
 
 class Station:
     
-    def __init__(self, nb_places, client_intensity, probabilities_of_target_station):
-        self.nb_places = nb_places
-        self.client_intensity = client_intensity
-        self.nb_used_places = 0
-        self.probabilities_of_target_station = probabilities_of_target_station
+    def __init__(self, _id, _nb_places, _client_intensity, _initial_fullness, _probabilities_of_target_station):
+        self.id = _id
+        self.nb_places = _nb_places
+        self.client_intensity = _client_intensity
+        self.nb_used_places = _initial_fullness
+        self.probabilities_of_target_station = _probabilities_of_target_station
         
 
 class Event:
     
-    def __init__(self, name, time, station, target_station = None):
-        self.name = name
-        self.time = time
-        self.station = station
-        self.target_station = target_station
+    def __init__(self, _name, _time, _station, _target_station = None):
+        self.name = _name
+        self.time = _time
+        self.station = _station
+        self.target_station = _target_station
     
     def __lt__(self,other):
         return (self.time < other.time)
+	
+    def __str__(self): #Overload print(Event e)
+        if self.name == "Pedestrian arrival":
+            return "New Event (Pedestrian) : Time={0:.3f} ; At S{1}".format(self.time, self.station.id)
+        elif self.name == "Bike arrival":
+            return "New Event (Bike)       : Time={0:.3f} ; From S{1} to S{2}".format(self.time, self.station.id, self.target_station.id)
+			
     
     def handle(self, list_stations, mean_travel_times):
         new_events = []
-        if self.name == "Arrival to station":
+        if self.name == "Pedestrian arrival":
             if self.station.nb_used_places > 0 :
                 destination = np.random.choice(list_stations, p = self.station.probabilities_of_target_station)
                 mtt = mean_travel_times[list_stations.index(self.station)][list_stations.index(destination)]
                 new_events.append(Event("Bike arrival", self.time +  np.random.exponential(mtt), self.station, destination))
                 self.station.nb_used_places -= 1
             else:
-                print("station vide")
-            new_events.append(Event("Arrival to station", self.time +  np.random.exponential(self.station.client_intensity), self.station))
+                print("-->station vide")
+            new_events.append(Event("Pedestrian arrival", self.time +  np.random.exponential(self.station.client_intensity), self.station))
             
         
         if self.name == "Bike arrival":
             if self.station.nb_places > self.station.nb_used_places:
                 self.target_station.nb_used_places += 1
             else:
-                print("station pleine")
+                print("-->station pleine")
                 destination = np.random.choice(list_stations, p = self.target_station.probabilities_of_target_station)
                 mtt = mean_travel_times[list_stations.index(self.target_station)][list_stations.index(destination)]
                 new_events.append(Event("Bike arrival", self.time +  np.random.exponential(mtt), self.target_station, destination))
@@ -53,21 +62,22 @@ class Event:
 
 def simulation(nb_places, client_intensities, mean_travel_times, initial_fullness, ending_time, list_probabilities_of_target_station):
     list_events = []
-    time = 0
+    current_time = 0
     list_stations = []
     for i in range(len(nb_places)):
-        list_stations.append(Station(nb_places[i], client_intensities[i], list_probabilities_of_target_station[i]))
+        list_stations.append(Station(i+3, nb_places[i], client_intensities[i], initial_fullness[i], list_probabilities_of_target_station[i]))
     
-    for i in range(len(list_stations)):
-        list_stations[i].nb_used_places = initial_fullness[i]
+    for i in range(5):
+        print(list_stations[i].id, list_stations[i].nb_places, list_stations[i].client_intensity, list_stations[i].nb_used_places)
     
     time_of_next_arrival_to_station = np.random.exponential(client_intensities)
-    list_events = [Event("Arrival to station", time + time_of_next_arrival_to_station[i], list_stations[i]) for i in range(len(list_stations))]
+    list_events = [Event("Pedestrian arrival", current_time + time_of_next_arrival_to_station[i], list_stations[i]) for i in range(len(list_stations))]
     hp.heapify(list_events)
     
-    while not time > ending_time:
+    while not current_time > ending_time:
         event = hp.heappop(list_events)
-        time = event.time
+        print(event)
+        current_time = event.time
         list_new_events = event.handle(list_stations, mean_travel_times)
         for new_event in list_new_events:
             hp.heappush(list_events, new_event)
