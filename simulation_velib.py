@@ -90,11 +90,11 @@ def simulation(nb_places, client_intensities, mean_travel_times, initial_fullnes
             hp.heappush(list_events, new_event)
     
     print("\n\n--- Loss Probabilities ---\n")
-    print("Bike arrivals : {0:.5f} {1:.5f} {2:.5f} {3:.5f} {4:.5f}\n".format(bike_arrivals_lost[0]/bike_arrivals_total[0],
-                                                                             bike_arrivals_lost[1]/bike_arrivals_total[1],
-                                                                             bike_arrivals_lost[2]/bike_arrivals_total[2],
-                                                                             bike_arrivals_lost[3]/bike_arrivals_total[3],
-                                                                             bike_arrivals_lost[4]/bike_arrivals_total[4]))
+    print("Bike arrivals :       {0:.5f} {1:.5f} {2:.5f} {3:.5f} {4:.5f}\n".format(bike_arrivals_lost[0]/bike_arrivals_total[0],
+                                                                                   bike_arrivals_lost[1]/bike_arrivals_total[1],
+                                                                                   bike_arrivals_lost[2]/bike_arrivals_total[2],
+                                                                                   bike_arrivals_lost[3]/bike_arrivals_total[3],
+                                                                                   bike_arrivals_lost[4]/bike_arrivals_total[4]))
     print("Pedestrian arrivals : {0:.5f} {1:.5f} {2:.5f} {3:.5f} {4:.5f}\n".format(pedestrian_arrivals_lost[0]/pedestrian_arrivals_total[0],
                                                                                    pedestrian_arrivals_lost[1]/pedestrian_arrivals_total[1],
                                                                                    pedestrian_arrivals_lost[2]/pedestrian_arrivals_total[2],
