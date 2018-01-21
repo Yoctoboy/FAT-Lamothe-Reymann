@@ -4,6 +4,12 @@ import heapq as hp
 import sys
 #il faut verifier ce que prend np.random.exponential en parametre
 
+bike_arrivals_total = np.zeros(5)
+pedestrian_arrivals_total = np.zeros(5)
+bike_arrivals_lost = np.zeros(5)
+pedestrian_arrivals_lost = np.zeros(5)
+
+
 class Station:
     
     def __init__(self, _id, _nb_places, _client_intensity, _initial_fullness, _probabilities_of_target_station):
@@ -35,6 +41,7 @@ class Event:
     def handle(self, list_stations, mean_travel_times):
         new_events = []
         if self.name == "Pedestrian arrival":
+            pedestrian_arrivals_total[self.station.id-3] += 1
             if self.station.nb_used_places > 0 :
                 destination = np.random.choice(list_stations, p = self.station.probabilities_of_target_station)
                 mtt = mean_travel_times[list_stations.index(self.station)][list_stations.index(destination)]
@@ -42,14 +49,17 @@ class Event:
                 self.station.nb_used_places -= 1
             else:
                 print("-->station vide")
+                pedestrian_arrivals_lost[self.station.id-3] += 1
             new_events.append(Event("Pedestrian arrival", self.time +  np.random.exponential(self.station.client_intensity), self.station))
             
         
         if self.name == "Bike arrival":
+            bike_arrivals_total[self.station.id-3] += 1
             if self.station.nb_places > self.station.nb_used_places:
                 self.target_station.nb_used_places += 1
             else:
                 print("-->station pleine")
+                bike_arrivals_lost[self.station.id-3] += 1
                 destination = np.random.choice(list_stations, p = self.target_station.probabilities_of_target_station)
                 mtt = mean_travel_times[list_stations.index(self.target_station)][list_stations.index(destination)]
                 new_events.append(Event("Bike arrival", self.time +  np.random.exponential(mtt), self.target_station, destination))
@@ -78,8 +88,20 @@ def simulation(nb_places, client_intensities, mean_travel_times, initial_fullnes
         list_new_events = event.handle(list_stations, mean_travel_times)
         for new_event in list_new_events:
             hp.heappush(list_events, new_event)
-        
     
+    print("\n\n--- Loss Probabilities ---\n")
+    print("Bike arrivals : {0:.5f} {1:.5f} {2:.5f} {3:.5f} {4:.5f}\n".format(bike_arrivals_lost[0]/bike_arrivals_total[0],
+                                                                             bike_arrivals_lost[1]/bike_arrivals_total[1],
+                                                                             bike_arrivals_lost[2]/bike_arrivals_total[2],
+                                                                             bike_arrivals_lost[3]/bike_arrivals_total[3],
+                                                                             bike_arrivals_lost[4]/bike_arrivals_total[4]))
+    print("Pedestrian arrivals : {0:.5f} {1:.5f} {2:.5f} {3:.5f} {4:.5f}\n".format(pedestrian_arrivals_lost[0]/pedestrian_arrivals_total[0],
+                                                                                   pedestrian_arrivals_lost[1]/pedestrian_arrivals_total[1],
+                                                                                   pedestrian_arrivals_lost[2]/pedestrian_arrivals_total[2],
+                                                                                   pedestrian_arrivals_lost[3]/pedestrian_arrivals_total[3],
+                                                                                   pedestrian_arrivals_lost[4]/pedestrian_arrivals_total[4]))
+
+
 nb_places = [24, 20, 20, 15, 20]
 initial_fullness = [20, 15, 17, 13, 18]
 client_intensities = [1/2.8, 1/3.7, 1/5.5, 1/3.5, 1/4.6]
